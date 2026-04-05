@@ -31,6 +31,8 @@ Set this frontend environment variable in Vercel:
 
 Backend container files:
 
+- `Dockerfile` (root monorepo Dockerfile for Railway)
+- `railway.toml` (root Railway config for monorepo)
 - `backend/Dockerfile`
 - `backend/.dockerignore`
 - `backend/railway.toml`

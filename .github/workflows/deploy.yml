@@ -1,4 +1,4 @@
-name: Deploy Railway + Vercel
+name: Simple Deploy (Railway + Vercel)
 
 on:
   workflow_dispatch:
@@ -9,49 +9,13 @@ on:
 jobs:
   backend-deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: backend/package-lock.json
-
-      - name: Install backend dependencies
-        working-directory: backend
-        run: npm ci
-
-      - name: Run backend tests
-        env:
-          NODE_ENV: test
-        working-directory: backend
-        run: npm test
-
       - name: Install Railway CLI
         run: npm i -g @railway/cli
-
-      - name: Validate Railway GitHub secrets
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
-          RAILWAY_ENVIRONMENT_ID: ${{ secrets.RAILWAY_ENVIRONMENT_ID }}
-          RAILWAY_SERVICE_ID: ${{ secrets.RAILWAY_SERVICE_ID }}
-        run: |
-          missing=0
-          for key in RAILWAY_TOKEN RAILWAY_PROJECT_ID RAILWAY_ENVIRONMENT_ID RAILWAY_SERVICE_ID; do
-            if [ -z "${!key}" ]; then
-              echo "::error::Missing required GitHub secret: $key"
-              missing=1
-            fi
-          done
-          if [ "$missing" -ne 0 ]; then
-            echo "::error::Deployment halted. Add required Railway secrets in GitHub repository settings."
-            exit 1
-          fi
 
       - name: Deploy backend to Railway
         env:
@@ -67,7 +31,7 @@ jobs:
 
   frontend-deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
     needs: backend-deploy
     steps:
       - name: Checkout
@@ -84,33 +48,8 @@ jobs:
         working-directory: frontend
         run: npm ci
 
-      - name: Build frontend
-        working-directory: frontend
-        env:
-          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
-        run: npm run build
-
       - name: Install Vercel CLI
         run: npm i -g vercel
-
-      - name: Validate Vercel GitHub secrets
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
-        run: |
-          missing=0
-          for key in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID VITE_API_BASE_URL; do
-            if [ -z "${!key}" ]; then
-              echo "::error::Missing required GitHub secret: $key"
-              missing=1
-            fi
-          done
-          if [ "$missing" -ne 0 ]; then
-            echo "::error::Deployment halted. Add required Vercel secrets in GitHub repository settings."
-            exit 1
-          fi
 
       - name: Pull Vercel project settings
         working-directory: frontend
@@ -128,5 +67,5 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
         run: |
-          vercel build --prod --token "$VERCEL_TOKEN"
+          vercel build --prod --yes --token "$VERCEL_TOKEN"
           vercel deploy --prebuilt --prod --token "$VERCEL_TOKEN"

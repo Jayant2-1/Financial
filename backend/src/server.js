@@ -1,7 +1,7 @@
 const http = require('http');
 const app = require('./app');
 const env = require('./config/env');
-const logger = require('./config/logger');
+const { logger } = require('./config/logger');
 const { connectDatabase, disconnectDatabase } = require('./config/db');
 
 const server = http.createServer(app);

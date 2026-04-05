@@ -13,7 +13,7 @@ const env = {
   bcryptSaltRounds: Number(process.env.BCRYPT_SALT_ROUNDS || 12),
   rateLimitWindowMs: Number(process.env.RATE_LIMIT_WINDOW_MS || 15 * 60 * 1000),
   rateLimitMax: Number(process.env.RATE_LIMIT_MAX || 100),
-  corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173',
   adminSetupKey: process.env.ADMIN_SETUP_KEY || 'bootstrap-admin-key',
   logLevel: process.env.LOG_LEVEL || 'info'
 };

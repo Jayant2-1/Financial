@@ -25,7 +25,7 @@ const ROLES = {
 const PERMISSIONS = {
   [ROLES.ADMIN]: ['users:*', 'records:*', 'dashboard:*'],
   [ROLES.ANALYST]: ['records:read', 'dashboard:read'],
-  [ROLES.VIEWER]: ['records:read', 'dashboard:read']
+  [ROLES.VIEWER]: ['dashboard:read']
 };
 
 const ERROR_CODES = {

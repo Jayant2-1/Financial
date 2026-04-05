@@ -11,13 +11,13 @@ const router = express.Router();
  * @swagger
  * /records:
  *   get:
- *     summary: List records with filters (viewer/analyst/admin)
+ *     summary: List records with filters (analyst/admin)
  *     tags: [Records]
  *   post:
  *     summary: Create record (admin)
  *     tags: [Records]
  */
-router.get('/', verifyToken, requireRoles('viewer', 'analyst', 'admin'), validateQuery(listRecordsQuerySchema), controller.listRecords);
+router.get('/', verifyToken, requireRoles('analyst', 'admin'), validateQuery(listRecordsQuerySchema), controller.listRecords);
 router.post('/', verifyToken, requireRoles('admin'), validateBody(createRecordSchema), controller.createRecord);
 
 /**
@@ -33,7 +33,7 @@ router.post('/', verifyToken, requireRoles('admin'), validateBody(createRecordSc
  *     summary: Soft delete record (admin)
  *     tags: [Records]
  */
-router.get('/:id', verifyToken, requireRoles('viewer', 'analyst', 'admin'), controller.getRecord);
+router.get('/:id', verifyToken, requireRoles('analyst', 'admin'), controller.getRecord);
 router.put('/:id', verifyToken, requireRoles('admin'), validateBody(updateRecordSchema), controller.updateRecord);
 router.delete('/:id', verifyToken, requireRoles('admin'), controller.deleteRecord);
 

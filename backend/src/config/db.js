@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const env = require('./env');
-const logger = require('./logger');
+const { logger } = require('./logger');
 
 async function connectDatabase() {
   mongoose.set('strictQuery', true);

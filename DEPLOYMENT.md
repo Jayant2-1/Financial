@@ -67,6 +67,8 @@ Backend container files:
 
 ## 5) Important notes
 
+- GitHub Secrets are used only by GitHub Actions to trigger deployments. They do not automatically create runtime variables inside Railway.
+- You must set backend runtime variables (`DATABASE_URL`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `CORS_ORIGIN`, etc.) directly in Railway service Variables.
 - In production, cookies are configured as `Secure` with `SameSite=None`.
 - Bootstrap admin can be disabled using `ALLOW_BOOTSTRAP_ADMIN=false`.
 - Do not commit real secrets to git.

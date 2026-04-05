@@ -7,6 +7,35 @@ This repository contains a role-based finance system:
 
 ---
 
+
+## Project structure
+
+```text
+backend/
+  src/
+    config/        # env, db, logger, swagger
+    constants/     # roles, error codes, enums
+    controllers/   # HTTP handlers
+    dtos/          # response mapping
+    middlewares/   # auth, role, validation, error, response shaping
+    models/        # mongoose schemas
+    repositories/  # data access
+    routes/        # endpoint wiring
+    services/      # business logic
+    utils/         # pagination, filtering, request context
+  tests/           # integration tests
+
+frontend/
+  src/
+    api/           # fetch client
+    components/    # shell, guards, UI pieces
+    context/       # auth provider + hooks
+    pages/         # login/dashboard/records/users/unauthorized
+```
+
+---
+
+
 ## Contents
 
 - [What is implemented](#what-is-implemented)
@@ -413,28 +442,4 @@ curl -X GET "http://localhost:4000/api/v1/dashboard/summary?dateFrom=2026-01-01"
 
 ---
 
-## Project structure
-
-```text
-backend/
-  src/
-    config/        # env, db, logger, swagger
-    constants/     # roles, error codes, enums
-    controllers/   # HTTP handlers
-    dtos/          # response mapping
-    middlewares/   # auth, role, validation, error, response shaping
-    models/        # mongoose schemas
-    repositories/  # data access
-    routes/        # endpoint wiring
-    services/      # business logic
-    utils/         # pagination, filtering, request context
-  tests/           # integration tests
-
-frontend/
-  src/
-    api/           # fetch client
-    components/    # shell, guards, UI pieces
-    context/       # auth provider + hooks
-    pages/         # login/dashboard/records/users/unauthorized
-```
 

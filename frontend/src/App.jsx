@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api/v1';
 
@@ -6,6 +6,7 @@ function App() {
   const [token, setToken] = useState(localStorage.getItem('accessToken') || '');
   const [output, setOutput] = useState('Ready');
   const [loading, setLoading] = useState(false);
+  const [health, setHealth] = useState('checking');
 
   const [registerForm, setRegisterForm] = useState({
     email: 'admin@test.com',
@@ -39,6 +40,19 @@ function App() {
     return h;
   }, [token]);
 
+  useEffect(() => {
+    async function checkHealth() {
+      try {
+        const res = await fetch(`${API_BASE.replace('/api/v1', '')}/health`);
+        setHealth(res.ok ? 'connected' : 'unhealthy');
+      } catch {
+        setHealth('offline');
+      }
+    }
+
+    checkHealth();
+  }, []);
+
   async function callApi(path, options = {}) {
     setLoading(true);
     try {
@@ -51,7 +65,8 @@ function App() {
         }
       });
 
-      const data = await res.json();
+      const contentType = res.headers.get('content-type') || '';
+      const data = contentType.includes('application/json') ? await res.json() : await res.text();
       setOutput(JSON.stringify({ status: res.status, data }, null, 2));
 
       if (path === '/auth/login' && res.ok && data?.data?.accessToken) {
@@ -80,6 +95,9 @@ function App() {
       <h1>Finance Backend Tester</h1>
       <p>
         API Base: <code>{API_BASE}</code>
+      </p>
+      <p>
+        Backend status: <strong>{health}</strong>
       </p>
 
       <section className="card">

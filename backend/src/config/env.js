@@ -22,6 +22,7 @@ const env = {
       ? process.env.ALLOW_BOOTSTRAP_ADMIN === 'true'
       : process.env.NODE_ENV !== 'production',
   seedSystemAdminOnStartup: process.env.SEED_SYSTEM_ADMIN_ON_STARTUP === 'true',
+  seedInitialUsersOnStartup: process.env.SEED_INITIAL_USERS_ON_STARTUP === 'true',
   seedDemoUsersOnStartup:
     process.env.SEED_DEMO_USERS_ON_STARTUP
       ? process.env.SEED_DEMO_USERS_ON_STARTUP === 'true'
@@ -34,6 +35,10 @@ const env = {
   dashboardSummaryCacheTtlSec: Number(process.env.DASHBOARD_SUMMARY_CACHE_TTL_SEC || 120),
   systemAdminEmail: process.env.SYSTEM_ADMIN_EMAIL || '',
   systemAdminPassword: process.env.SYSTEM_ADMIN_PASSWORD || '',
+  initialAnalystEmail: process.env.INITIAL_ANALYST_EMAIL || '',
+  initialAnalystPassword: process.env.INITIAL_ANALYST_PASSWORD || '',
+  initialViewerEmail: process.env.INITIAL_VIEWER_EMAIL || '',
+  initialViewerPassword: process.env.INITIAL_VIEWER_PASSWORD || '',
   logLevel: process.env.LOG_LEVEL || 'info'
 };
 
@@ -53,6 +58,16 @@ if (env.nodeEnv !== 'test') {
 
     if (env.seedSystemAdminOnStartup && (!env.systemAdminEmail || !env.systemAdminPassword)) {
       throw new Error('SYSTEM_ADMIN_EMAIL and SYSTEM_ADMIN_PASSWORD are required when SEED_SYSTEM_ADMIN_ON_STARTUP=true');
+    }
+
+    if (
+      env.seedInitialUsersOnStartup
+      && (!env.initialAnalystEmail
+        || !env.initialAnalystPassword
+        || !env.initialViewerEmail
+        || !env.initialViewerPassword)
+    ) {
+      throw new Error('INITIAL_ANALYST_EMAIL, INITIAL_ANALYST_PASSWORD, INITIAL_VIEWER_EMAIL, INITIAL_VIEWER_PASSWORD are required when SEED_INITIAL_USERS_ON_STARTUP=true');
     }
   }
 }

@@ -3,7 +3,7 @@ const app = require('./app');
 const env = require('./config/env');
 const { logger } = require('./config/logger');
 const { connectDatabase, disconnectDatabase } = require('./config/db');
-const { ensureSystemAdmin, ensureDemoUsers, ensureDemoRecords } = require('./services/systemAdmin.service');
+const { ensureSystemAdmin, ensureInitialUsers, ensureDemoUsers, ensureDemoRecords } = require('./services/systemAdmin.service');
 const { initializeCache, disconnectCache } = require('./services/cache.service');
 
 const server = http.createServer(app);
@@ -12,6 +12,7 @@ async function start() {
   await connectDatabase();
   await initializeCache();
   await ensureSystemAdmin();
+  await ensureInitialUsers();
   await ensureDemoUsers();
   await ensureDemoRecords();
   server.listen(env.port, () => {

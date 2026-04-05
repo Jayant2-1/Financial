@@ -17,6 +17,11 @@ Set these backend environment variables in Railway:
 - `CORS_ORIGIN=https://<your-vercel-domain>`
 - `ALLOW_BOOTSTRAP_ADMIN=false`
 - `SEED_SYSTEM_ADMIN_ON_STARTUP=true`
+- `SEED_INITIAL_USERS_ON_STARTUP=true`
+- `INITIAL_ANALYST_EMAIL=<initial-analyst-email>`
+- `INITIAL_ANALYST_PASSWORD=<initial-analyst-password>`
+- `INITIAL_VIEWER_EMAIL=<initial-viewer-email>`
+- `INITIAL_VIEWER_PASSWORD=<initial-viewer-password>`
 - `SEED_DEMO_USERS_ON_STARTUP=false`
 - `SEED_DEMO_RECORDS_ON_STARTUP=false`
 - `SYSTEM_ADMIN_EMAIL=<initial-admin-email>`

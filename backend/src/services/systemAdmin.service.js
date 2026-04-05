@@ -62,6 +62,24 @@ async function ensureDemoUsers() {
   }
 }
 
+async function ensureInitialUsers() {
+  if (env.nodeEnv === 'test' || !env.seedInitialUsersOnStartup) {
+    return;
+  }
+
+  await createUserIfMissing({
+    email: env.initialAnalystEmail,
+    password: env.initialAnalystPassword,
+    role: 'analyst'
+  });
+
+  await createUserIfMissing({
+    email: env.initialViewerEmail,
+    password: env.initialViewerPassword,
+    role: 'viewer'
+  });
+}
+
 function buildDemoRecords(userIds) {
   const now = new Date();
   const categories = ['salary', 'food', 'rent', 'transport', 'utilities', 'investment', 'shopping'];
@@ -151,4 +169,4 @@ async function ensureSystemAdmin() {
   logger.info(`System admin created: ${email}`);
 }
 
-module.exports = { ensureSystemAdmin, ensureDemoUsers, ensureDemoRecords };
+module.exports = { ensureSystemAdmin, ensureInitialUsers, ensureDemoUsers, ensureDemoRecords };

@@ -9,3 +9,6 @@ backend/coverage
 logs
 backend/logs
 npm-debug.log*
+*.md
+!/README.md
+!backend/README_GITHUB.md

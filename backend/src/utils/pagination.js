@@ -30,15 +30,18 @@ function parseOffsetPagination(limit = PAGINATION.DEFAULT_LIMIT, offset = PAGINA
 }
 
 function createPaginationResponse(items, total, limit, offset) {
+  const normalizedLimit = Math.max(parseInt(limit, 10) || PAGINATION.DEFAULT_LIMIT, 1);
+  const normalizedOffset = Math.max(parseInt(offset, 10) || PAGINATION.DEFAULT_OFFSET, 0);
+
   return {
     items,
     pagination: {
       total,
-      limit,
-      offset,
-      pages: Math.ceil(total / limit),
-      hasNext: offset + limit < total,
-      hasPrev: offset > 0
+      limit: normalizedLimit,
+      offset: normalizedOffset,
+      pages: Math.max(Math.ceil(total / normalizedLimit), 1),
+      hasNext: normalizedOffset + normalizedLimit < total,
+      hasPrev: normalizedOffset > 0
     }
   };
 }

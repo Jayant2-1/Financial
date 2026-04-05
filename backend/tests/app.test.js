@@ -9,6 +9,7 @@ let mongod;
 let adminToken;
 let viewerToken;
 let analystToken;
+let analystUserId;
 let createdRecordId;
 
 beforeAll(async () => {
@@ -42,6 +43,7 @@ beforeAll(async () => {
     .send({ email: 'analyst@test.com', password: 'AnalystPass123!', role: 'analyst', isActive: true });
 
   expect(createAnalyst.statusCode).toBe(201);
+  analystUserId = createAnalyst.body.data.id;
 
   const viewerLogin = await request(app).post('/api/v1/auth/login').send({
     email: 'viewer@test.com',
@@ -140,6 +142,41 @@ test('admin can create record', async () => {
   createdRecordId = res.body.data.id;
 });
 
+test('records are linked to users and analysts only see their own records', async () => {
+  await request(app)
+    .post('/api/v1/records')
+    .set('Authorization', `Bearer ${adminToken}`)
+    .send({
+      amount: 450,
+      type: 'expense',
+      category: 'transport',
+      date: '2026-04-03',
+      notes: 'taxi',
+      createdBy: analystUserId
+    });
+
+  const res = await request(app)
+    .get('/api/v1/records?type=expense&category=transport&dateFrom=2026-04-01&dateTo=2026-04-30')
+    .set('Authorization', `Bearer ${analystToken}`);
+
+  expect(res.statusCode).toBe(200);
+  expect(Array.isArray(res.body.data.items)).toBe(true);
+  expect(res.body.data.items.length).toBeGreaterThan(0);
+
+  res.body.data.items.forEach((item) => {
+    expect(item.type).toBe('expense');
+    expect(item.category.toLowerCase()).toBe('transport');
+    expect(item.createdBy.id).toBe(analystUserId);
+  });
+
+  const adminAllRecords = await request(app)
+    .get('/api/v1/records')
+    .set('Authorization', `Bearer ${adminToken}`);
+
+  expect(adminAllRecords.statusCode).toBe(200);
+  expect(adminAllRecords.body.data.items.length).toBeGreaterThan(res.body.data.items.length);
+});
+
 test('dashboard summary returns totals', async () => {
   await request(app)
     .post('/api/v1/records')
@@ -152,7 +189,7 @@ test('dashboard summary returns totals', async () => {
 
   expect(res.statusCode).toBe(200);
   expect(res.body.data.totalIncome).toBe(1200);
-  expect(res.body.data.totalExpenses).toBe(300);
-  expect(res.body.data.netBalance).toBe(900);
+  expect(res.body.data.totalExpenses).toBe(750);
+  expect(res.body.data.netBalance).toBe(450);
   expect(Array.isArray(res.body.data.recentActivity)).toBe(true);
 });

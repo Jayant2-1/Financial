@@ -17,6 +17,23 @@ const env = {
     process.env.CORS_ORIGIN ||
     'http://localhost:5173,http://127.0.0.1:5173,http://[::1]:5173',
   adminSetupKey: process.env.ADMIN_SETUP_KEY || 'bootstrap-admin-key',
+  allowBootstrapAdmin:
+    process.env.ALLOW_BOOTSTRAP_ADMIN
+      ? process.env.ALLOW_BOOTSTRAP_ADMIN === 'true'
+      : process.env.NODE_ENV !== 'production',
+  seedSystemAdminOnStartup: process.env.SEED_SYSTEM_ADMIN_ON_STARTUP === 'true',
+  seedDemoUsersOnStartup:
+    process.env.SEED_DEMO_USERS_ON_STARTUP
+      ? process.env.SEED_DEMO_USERS_ON_STARTUP === 'true'
+      : process.env.NODE_ENV !== 'production',
+  seedDemoRecordsOnStartup:
+    process.env.SEED_DEMO_RECORDS_ON_STARTUP
+      ? process.env.SEED_DEMO_RECORDS_ON_STARTUP === 'true'
+      : process.env.NODE_ENV !== 'production',
+  redisUrl: process.env.REDIS_URL || '',
+  dashboardSummaryCacheTtlSec: Number(process.env.DASHBOARD_SUMMARY_CACHE_TTL_SEC || 120),
+  systemAdminEmail: process.env.SYSTEM_ADMIN_EMAIL || '',
+  systemAdminPassword: process.env.SYSTEM_ADMIN_PASSWORD || '',
   logLevel: process.env.LOG_LEVEL || 'info'
 };
 
@@ -24,6 +41,16 @@ if (env.nodeEnv !== 'test') {
   ['databaseUrl', 'jwtAccessSecret', 'jwtRefreshSecret'].forEach((k) => {
     if (!env[k]) throw new Error(`Missing required env var: ${k}`);
   });
+
+  if (env.nodeEnv === 'production') {
+    if (!process.env.CORS_ORIGIN) {
+      throw new Error('CORS_ORIGIN must be set in production');
+    }
+
+    if (env.seedSystemAdminOnStartup && (!env.systemAdminEmail || !env.systemAdminPassword)) {
+      throw new Error('SYSTEM_ADMIN_EMAIL and SYSTEM_ADMIN_PASSWORD are required when SEED_SYSTEM_ADMIN_ON_STARTUP=true');
+    }
+  }
 }
 
 module.exports = env;

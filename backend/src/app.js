@@ -24,6 +24,8 @@ const allowedOrigins = env.corsOrigin
   .map((o) => o.trim())
   .filter(Boolean);
 
+const localDevOriginRegex = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/;
+
 app.use(helmet());
 app.use(
   cors({
@@ -31,7 +33,13 @@ app.use(
       if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
-      return callback(new Error(`CORS blocked for origin: ${origin}`));
+
+      if (env.nodeEnv !== 'production' && localDevOriginRegex.test(origin)) {
+        return callback(null, true);
+      }
+
+      logger.warn(`CORS blocked for origin: ${origin}`);
+      return callback(null, false);
     },
     credentials: true
   })

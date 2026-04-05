@@ -1,10 +1,19 @@
 const express = require('express');
 const controller = require('../controllers/auth.controller');
+const env = require('../config/env');
 const { validateBody } = require('../middlewares/validate.middleware');
 const { registerSchema, loginSchema } = require('../validators/auth.validator');
 const { verifyToken } = require('../middlewares/auth.middleware');
+const { AuthorizationError } = require('../utils/ApiError');
 
 const router = express.Router();
+
+function ensureBootstrapEnabled(_req, _res, next) {
+	if (!env.allowBootstrapAdmin) {
+		return next(new AuthorizationError('Bootstrap admin endpoint is disabled'));
+	}
+	return next();
+}
 
 /**
  * @swagger
@@ -13,7 +22,7 @@ const router = express.Router();
  *     summary: Bootstrap first admin only
  *     tags: [Auth]
  */
-router.post('/register', validateBody(registerSchema), controller.register);
+router.post('/register', ensureBootstrapEnabled, validateBody(registerSchema), controller.register);
 
 /**
  * @swagger
@@ -23,6 +32,15 @@ router.post('/register', validateBody(registerSchema), controller.register);
  *     tags: [Auth]
  */
 router.post('/login', validateBody(loginSchema), controller.login);
+
+/**
+ * @swagger
+ * /auth/bootstrap-status:
+ *   get:
+ *     summary: Check whether bootstrap admin registration is available
+ *     tags: [Auth]
+ */
+router.get('/bootstrap-status', controller.bootstrapStatus);
 
 /**
  * @swagger

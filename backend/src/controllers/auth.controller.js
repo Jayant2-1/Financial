@@ -4,17 +4,19 @@ const env = require('../config/env');
 
 function setAuthCookies(res, accessToken, refreshToken) {
   const secure = env.nodeEnv === 'production';
+  const sameSite = env.nodeEnv === 'production' ? 'none' : 'lax';
+
   res.cookie('accessToken', accessToken, {
     httpOnly: true,
     secure,
-    sameSite: 'strict',
+    sameSite,
     maxAge: 15 * 60 * 1000,
     path: '/'
   });
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
     secure,
-    sameSite: 'strict',
+    sameSite,
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: '/'
   });
@@ -35,6 +37,10 @@ const login = asyncHandler(async (req, res) => {
 
 const refresh = asyncHandler(async (req, res) => {
   const token = req.cookies?.refreshToken || req.body?.refreshToken;
+  if (!token) {
+    return res.status(204).end();
+  }
+
   const ipAddress = req.ip;
   const userAgent = req.get('user-agent');
   const { user, accessToken, refreshToken } = await authService.refresh(token, ipAddress, userAgent);
@@ -49,4 +55,9 @@ const logout = asyncHandler(async (req, res) => {
   res.status(200).json({ message: 'Logged out successfully' });
 });
 
-module.exports = { register, login, refresh, logout };
+const bootstrapStatus = asyncHandler(async (_req, res) => {
+  const status = await authService.getBootstrapStatus();
+  res.status(200).json(status);
+});
+
+module.exports = { register, login, refresh, logout, bootstrapStatus };

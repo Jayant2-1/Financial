@@ -8,8 +8,8 @@ const createUser = asyncHandler(async (req, res) => {
 });
 
 const listUsers = asyncHandler(async (req, res) => {
-  const { items, total } = await userService.listUsers(req.query);
-  const pagination = createPaginationResponse(items, total, req.query.limit, req.query.offset);
+  const { items, total, limit, offset } = await userService.listUsers(req.query);
+  const pagination = createPaginationResponse(items, total, limit, offset);
   res.status(200).json(pagination);
 });
 

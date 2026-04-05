@@ -9,6 +9,10 @@ const { toUserDTO } = require('../dtos/user.dto');
 const { signAccessToken, rotateRefreshToken, hashToken } = require('./token.service');
 
 async function registerBootstrapAdmin({ email, password, setupKey }) {
+  if (!env.allowBootstrapAdmin) {
+    throw new AuthenticationError('Bootstrap admin is disabled', ERROR_CODES.FORBIDDEN);
+  }
+
   if (setupKey !== env.adminSetupKey) {
     throw new AuthenticationError('Invalid setup key', ERROR_CODES.INVALID_SETUP_KEY);
   }
@@ -78,4 +82,12 @@ async function logout(userId) {
   await refreshRepo.revokeByUserId(userId);
 }
 
-module.exports = { registerBootstrapAdmin, login, refresh, logout };
+async function getBootstrapStatus() {
+  const userCount = await userRepo.countUsers();
+  return {
+    bootstrapAvailable: userCount === 0,
+    userCount
+  };
+}
+
+module.exports = { registerBootstrapAdmin, login, refresh, logout, getBootstrapStatus };

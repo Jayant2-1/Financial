@@ -24,7 +24,12 @@ async function createUser(payload) {
 async function listUsers(query) {
   const pagination = parseOffsetPagination(query.limit, query.offset);
   const { items, total } = await userRepo.listUsers(pagination);
-  return { items: items.map(toUserDTO), total };
+  return {
+    items: items.map(toUserDTO),
+    total,
+    limit: pagination.limit,
+    offset: pagination.offset
+  };
 }
 
 async function updateUser(id, payload) {

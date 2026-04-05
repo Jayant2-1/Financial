@@ -2,8 +2,12 @@ const Record = require('../models/record.model');
 const { RECORD_TYPES } = require('../constants/app.constants');
 const { parseOffsetPagination, parseSorting } = require('../utils/pagination');
 
-function buildFilter({ type, category, dateFrom, dateTo, search, tags }) {
+function buildFilter({ type, category, date, dateFrom, dateTo, search, tags, createdBy }) {
   const query = { deletedAt: null };
+
+  if (createdBy) {
+    query.createdBy = createdBy;
+  }
 
   if (type && Object.values(RECORD_TYPES).includes(type)) {
     query.type = type;
@@ -13,7 +17,19 @@ function buildFilter({ type, category, dateFrom, dateTo, search, tags }) {
     query.category = { $regex: `^${category}$`, $options: 'i' };
   }
 
-  if (dateFrom || dateTo) {
+  if (date) {
+    const selectedDate = new Date(date);
+    const startOfDay = new Date(selectedDate);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(selectedDate);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    query.date = {
+      $gte: startOfDay,
+      $lte: endOfDay
+    };
+  } else if (dateFrom || dateTo) {
     query.date = {};
     if (dateFrom) query.date.$gte = new Date(dateFrom);
     if (dateTo) query.date.$lte = new Date(dateTo);
@@ -38,12 +54,17 @@ async function createRecord(data) {
   return record.save();
 }
 
-async function findById(id) {
-  return Record.findOne({ _id: id, deletedAt: null }).populate('createdBy', 'email role');
+async function findById(id, createdBy = null) {
+  const query = { _id: id, deletedAt: null };
+  if (createdBy) {
+    query.createdBy = createdBy;
+  }
+
+  return Record.findOne(query).populate('createdBy', 'email role');
 }
 
-async function listRecords(filters, limit, offset, sortBy) {
-  const query = buildFilter(filters);
+async function listRecords(filters, limit, offset, sortBy, createdBy = null) {
+  const query = buildFilter({ ...filters, createdBy });
   const { limit: parsedLimit, offset: parsedOffset } = parseOffsetPagination(limit, offset);
   const sortObj = parseSorting(sortBy);
 
@@ -60,20 +81,34 @@ async function listRecords(filters, limit, offset, sortBy) {
   return { items, total };
 }
 
-async function updateRecord(id, data) {
-  return Record.findOneAndUpdate({ _id: id, deletedAt: null }, data, { new: true }).populate('createdBy', 'email role');
+async function updateRecord(id, data, createdBy = null) {
+  const query = { _id: id, deletedAt: null };
+  if (createdBy) {
+    query.createdBy = createdBy;
+  }
+
+  return Record.findOneAndUpdate(query, data, { new: true }).populate('createdBy', 'email role');
 }
 
-async function softDeleteRecord(id) {
+async function softDeleteRecord(id, createdBy = null) {
+  const query = { _id: id, deletedAt: null };
+  if (createdBy) {
+    query.createdBy = createdBy;
+  }
+
   return Record.findOneAndUpdate(
-    { _id: id, deletedAt: null },
+    query,
     { deletedAt: new Date() },
     { new: true }
   );
 }
 
-async function summary({ dateFrom, dateTo }) {
+async function summary({ dateFrom, dateTo }, createdBy = null) {
   const match = { deletedAt: null };
+  if (createdBy) {
+    match.createdBy = createdBy;
+  }
+
   if (dateFrom || dateTo) {
     match.date = {};
     if (dateFrom) match.date.$gte = new Date(dateFrom);
@@ -97,8 +132,12 @@ async function summary({ dateFrom, dateTo }) {
   return { totals, byCategory, recent };
 }
 
-async function monthlyTrends({ dateFrom, dateTo }) {
+async function monthlyTrends({ dateFrom, dateTo }, createdBy = null) {
   const match = { deletedAt: null };
+  if (createdBy) {
+    match.createdBy = createdBy;
+  }
+
   if (dateFrom || dateTo) {
     match.date = {};
     if (dateFrom) match.date.$gte = new Date(dateFrom);

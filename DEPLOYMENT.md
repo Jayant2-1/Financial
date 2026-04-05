@@ -22,8 +22,6 @@ Set these backend environment variables in Railway:
 - `INITIAL_ANALYST_PASSWORD=<initial-analyst-password>`
 - `INITIAL_VIEWER_EMAIL=<initial-viewer-email>`
 - `INITIAL_VIEWER_PASSWORD=<initial-viewer-password>`
-- `SEED_DEMO_USERS_ON_STARTUP=false`
-- `SEED_DEMO_RECORDS_ON_STARTUP=false`
 - `SYSTEM_ADMIN_EMAIL=<initial-admin-email>`
 - `SYSTEM_ADMIN_PASSWORD=<initial-admin-password>`
 - `LOG_LEVEL=info`
@@ -71,6 +69,4 @@ Backend container files:
 
 - In production, cookies are configured as `Secure` with `SameSite=None`.
 - Bootstrap admin can be disabled using `ALLOW_BOOTSTRAP_ADMIN=false`.
-- Demo analyst/viewer seeding can be disabled in production using `SEED_DEMO_USERS_ON_STARTUP=false`.
-- Demo records can be disabled in production using `SEED_DEMO_RECORDS_ON_STARTUP=false`.
 - Do not commit real secrets to git.

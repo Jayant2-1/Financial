@@ -23,14 +23,6 @@ const env = {
       : process.env.NODE_ENV !== 'production',
   seedSystemAdminOnStartup: process.env.SEED_SYSTEM_ADMIN_ON_STARTUP === 'true',
   seedInitialUsersOnStartup: process.env.SEED_INITIAL_USERS_ON_STARTUP === 'true',
-  seedDemoUsersOnStartup:
-    process.env.SEED_DEMO_USERS_ON_STARTUP
-      ? process.env.SEED_DEMO_USERS_ON_STARTUP === 'true'
-      : process.env.NODE_ENV !== 'production',
-  seedDemoRecordsOnStartup:
-    process.env.SEED_DEMO_RECORDS_ON_STARTUP
-      ? process.env.SEED_DEMO_RECORDS_ON_STARTUP === 'true'
-      : process.env.NODE_ENV !== 'production',
   redisUrl: process.env.REDIS_URL || '',
   dashboardSummaryCacheTtlSec: Number(process.env.DASHBOARD_SUMMARY_CACHE_TTL_SEC || 120),
   systemAdminEmail: process.env.SYSTEM_ADMIN_EMAIL || '',

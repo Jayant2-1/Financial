@@ -5,7 +5,7 @@ dotenv.config();
 const env = {
   nodeEnv: process.env.NODE_ENV || 'development',
   port: Number(process.env.PORT || 4000),
-  databaseUrl: process.env.DATABASE_URL,
+  databaseUrl: process.env.DATABASE_URL || process.env.MONGODB_URL || process.env.MONGO_URL,
   jwtAccessSecret: process.env.JWT_ACCESS_SECRET,
   jwtRefreshSecret: process.env.JWT_REFRESH_SECRET,
   jwtAccessExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN || '15m',
@@ -38,7 +38,11 @@ const env = {
 };
 
 if (env.nodeEnv !== 'test') {
-  ['databaseUrl', 'jwtAccessSecret', 'jwtRefreshSecret'].forEach((k) => {
+  if (!env.databaseUrl) {
+    throw new Error('Missing required env var: DATABASE_URL (or MONGODB_URL / MONGO_URL)');
+  }
+
+  ['jwtAccessSecret', 'jwtRefreshSecret'].forEach((k) => {
     if (!env[k]) throw new Error(`Missing required env var: ${k}`);
   });
 
